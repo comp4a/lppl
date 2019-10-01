@@ -16,27 +16,37 @@
 %option nounput       
 %option yylineno  
 
-letraMinus      [a-z]
-letraMayus      [A-Z] 
-digito          [0-9]
-delimitador     [ \t\n]+
-entero          {digito}+
-boolean         "true" | "false"
-simbolo         {letraMinus} | {letraMayus} | "_" | {digito}
-!!!! id         {letraMinus}{simbolo}*
-tipoSimple      {entero} | {boolean}
+//TODO: definir cte
+//TODO: preguntar que parte de la gramatica tenemos que definir
+//TODO: preguntar que han de devolver las funciones
 
-declaracion     {tipoSimple} {id} ";"
-                | {tipoSimple} {id} "=" {constante} ";"
-                | {tipoSimple} {id} "[" {cte} "]" ";"
-                | {struct} "{" {listaCampos} "}" {id} ";" }
+letraMinus      			[a-z]
+letraMayus      			[A-Z] 
+digito          			[0-9]
+delimitador     			[ \t\n]+
+entero          			{digito}+
+boolean         			"true" | "false"
+simbolo         			{letraMinus} 
+							| {letraMayus} 
+							| "_" 
+							| {digito}
 
-instruccion     "{" "}"
-                | "{" {listaInstrucciones} "}"
-                | {instruccionEntradaSalida}
-                | {instruccionSeleccion}
-                | {instruccionIteracion} 
-                | {instruccionExpresion}
+id         					({letraMinus}| "_"){simbolo}*
+
+tipoSimple      			{entero} 
+							| {boolean}
+
+declaracion     			{tipoSimple} {id} ";"
+			                | {tipoSimple} {id} "=" {constante} ";"
+			                | {tipoSimple} {id} "[" {cte} "]" ";"
+			                | "struct" "{" {listaCampos} "}" {id} ";"
+
+instruccion     			"{" "}"
+			                | "{" {listaInstrucciones} "}"
+			                | {instruccionEntradaSalida}
+			                | {instruccionSeleccion}
+			                | {instruccionIteracion} 
+			                | {instruccionExpresion}
 
 listaInstrucciones           {instruccion}+
 
@@ -47,71 +57,76 @@ instruccionSeleccion         "if" "(" {expresion} ")" {instruccion} "else" {inst
 
 instruccionIteracion         "while" "(" {expresion} ")" {instruccion}
 
-instruccionExpresion        {expresion} ";" | ";"
+instruccionExpresion        {expresion} ";" 
+							| ";"
+
 expresion                   {expresionLogica} 
                             | {id} {operadorAsignacion} {expresion} 
                             | {id} "[" {expresion} "]" {operadorAsignacion} {expresion}
                             | {id} . {id} {operadorAsignacion} {expresion}
 
-expresionLogica {expresionIgualdad}
-                | {expresionLogica} {operadorLogico} {expresionIgualdad}        
+expresionLogica 			{expresionIgualdad}
+                			| {expresionLogica} {operadorLogico} {expresionIgualdad}        
 
-expresionIgualdad {expresionRelacional}
-                | {expresionIgualdad} {operadorIgualdad} {expresionRelacional}
+expresionIgualdad 			{expresionRelacional}
+                			| {expresionIgualdad} {operadorIgualdad} {expresionRelacional}
 
-expresionRelacional {expresionAditiva}
-    | {expresionRelacional} {operadorRelacional} {expresionAditiva}
+expresionRelacional 		{expresionAditiva}
+    						| {expresionRelacional} {operadorRelacional} {expresionAditiva}
 
- expresionAditiva {expresionMultiplicativa}
-    | {expresionAditiva} {operadorAditivo} {expresionMultiplicativa}
+ expresionAditiva 			{expresionMultiplicativa}
+    						| {expresionAditiva} {operadorAditivo} {expresionMultiplicativa}
 
-expresionMultiplicativa {expresionUnaria}
-    | {expresionMultiplicativa} {operadorMultiplicativo} {expresionUnaria}
+expresionMultiplicativa 	{expresionUnaria}
+    						| {expresionMultiplicativa} {operadorMultiplicativo} {expresionUnaria}
 
-expresionUnaria {expresionSufija}
-    | {operadorUnario} {expresionUnaria}
-    | {operadorIncremento} {id}
+expresionUnaria 			{expresionSufija}
+						    | {operadorUnario} {expresionUnaria}
+						    | {operadorIncremento} {id}
 
-expresionSufija "(" {expresion} ")"
-    | {id} {operadorIncremento}
-    | {id} "[" {expresion} "]"
-    | {id}
-    | {id} . {id}
-    | {constante}
+expresionSufija 			"(" {expresion} ")"
+						    | {id} {operadorIncremento}
+						    | {id} "[" {expresion} "]"
+						    | {id}
+						    | {id} . {id}
+						    | {constante}
 
-constante {cte}
-    | {boolean}    
+constante 					{cte}
+    						| {boolean}    
 
-sentencia       {declaracion} | {instruccion}
+sentencia       			{declaracion} 
+							| {instruccion}
+
 secuenciaSentencias  {sentencia}+
 programa       "{" {secuenciaSentencias} "}"
-listaCampos     {tipoSimple} {id} ";" | {listaCampos} {tipoSimple} {id} ";"
+listaCampos     {tipoSimple} {id} ";" 
+				| {listaCampos} {tipoSimple} {id} ";"
 
 %%
 {delimitador}  { if (verbosidad) ECHO; }
-"+"	       { retornar (MAS_);   }
-"-"            { retornar (MENOS_); }
-"*"            { retornar (POR_);   }
-"/"            { retornar (DIV_);   }
-"%"
-"("            { retornar (OPAR_);  }
-")"            { retornar (DIV_);   }
-"="
-"+="
-"-="
-"*="
-"/="
-"&&"
-"||"
-"=="
-"!="
-">"
-"<"
-">="
-"<="
-"!"
-"++"
-"--"
+"+"		{ retornar (MAS_);   }
+"-"     { retornar (MENOS_); }
+"*"     { retornar (POR_);   }
+"/"     { retornar (DIV_);   }
+"%"		{ retornar (DIV_);   }
+"("     { retornar (OPAR_);  }
+")"     { retornar (DIV_);   }
+"="		{ retornar (DIV_);   }
+"+="	{ retornar (DIV_);   }
+"-="	{ retornar (DIV_);   }
+"*="	{ retornar (DIV_);   }
+"/="	{ retornar (DIV_);   }
+"&&"	{ retornar (DIV_);   }
+"||"	{ retornar (DIV_);   }
+"=="	{ retornar (DIV_);   }
+"!="	{ retornar (DIV_);   }
+">"		{ retornar (DIV_);   }
+"<"		{ retornar (DIV_);   }
+">="	{ retornar (DIV_);   }
+"<="	{ retornar (DIV_);   }
+"!"		{ retornar (DIV_);   }
+"++"	{ retornar (DIV_);   }
+"--"	{ retornar (DIV_);   }
 {entero}       { retornar (CTE_);   }
 
 .	       { yyerror("Caracter desconocido"); }
@@ -143,3 +158,4 @@ int main(int argc, char **argv)
   return (0);
 } 
 /*****************************************************************************/
+
