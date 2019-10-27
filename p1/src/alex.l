@@ -23,11 +23,13 @@ id          				{letra}({letra}|{digito})*
 cte          				({digito}+"."{digito}*)|({digito}*"."{digito}+)|({digito}+)
 
 comentario					"//".*\n
-delimitador     			[ \t\n]+
+delimitador     			[ \t]+
+nueva_linea					\n
 
 %%
+{nueva_linea} 	{ if (verbosidad) {ECHO; printf("%3d.- ", yylineno);} } 
 {delimitador}   { if (verbosidad) ECHO; }
-{comentario}	{ if (verbosidad) ECHO; }
+{comentario}	{ if (verbosidad) {ECHO; printf("%3d.- ", yylineno);} }
 
 "+"		{ retornar (MAS_);   }
 "-"     { retornar (MENOS_); }
